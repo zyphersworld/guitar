@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Guitar Chord Dictionary - By Chris Greene</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<style>
+	h1{
+		text-align: center;
+		font-family:sans-serif;
+		font-size: 1.5em;
+	}
+
+	button.cm{
+		width:20px;
+		height: 40px;
+		padding:5px;
+	}
+
+	.fingerOn{
+		background-color: #f00;
+	}
+
+	#chordMaker{
+		width:300px;
+		margin:0px auto;
+		text-align: center;
+	}
+
+	#chordSheet{
+		width:100%;
+		margin:0px auto;
+		background-color: #ffe;
+		text-align: center;
+	}
+
+	#chordSheet img{
+
+		margin:0px 5px 0px 5px;
+	}
+
+	button.make button.strum{
+		display:inline-block;
+		width:150px;
+		margin:20px auto;
+	}
+
+	</style>
+</head>
+<body>
+
+<h1>Chord Programing Test</h1>
+
+<div id="chordMaker">
+
+	<div class="fret" data-fret=1>
+		<button class="cm" ></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+	</div>
+
+	<div class="fret" data-fret=2>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+	</div>
+
+	<div class="fret" data-fret=3>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+		<button class="cm"></button>
+	</div>
+
+</div>
+
+<button class="make">Make Chord</button>
+<button class="strum">enable struming</button>
+<br /><br />
+
+
+<div id="chordSheet"></div>
+
+
+<script src="jquery-1.11.3.min.js"></script>
+
+
+
+<script>
+//LISTENERS
+////////////////////////////////////////////////////////////////////////
+$(".cm").on("click",function(e){
+	$(this).toggleClass("fingerOn");
+})
+
+$(".make").on("click",function(e){
+	makeChord();
+})
+
+$("#chordSheet").on("mousemove",function(e){
+      // e = Mouse click event.
+      var rect = e.target.getBoundingClientRect();
+      var x = e.clientX - rect.left; //x position within the element.
+      var y = e.clientY - rect.top;  //y position within the element.
+      //console.log("X : " + x + " ; Y : " + y + ".");
+      
+      // 12 32 52 72 92 102
+      if(x==12){
+		playNote(82);
+	  }
+	  if(x==32){
+		  playNote(110);
+	  }
+	  if(x==52){
+		  playNote(146);
+	  }
+	  if(x==72){
+		  playNote(196);
+	  }
+	  if(x==92){
+		  playNote(246);
+	  }
+	  if(x==112){
+		  playNote(329);
+	  }
+})
+
+$(".strum").on("click",function(e){
+	enableStrum();
+})
+////////////////////////////////////////////////////////////////////////
+
+function enableStrum(){
+try {
+window.context = window.AudioContext|| window.webkitAudioContext;
+context = new AudioContext();
+}
+catch(e) {
+alert("Web Audio API is not supported in this browser");
+}
+}
+
+
+// PLAY A NOTE ON STRUM
+// need to figure out permissions so plays with no interaction.
+////////////////////////////////////////////////////////////////////////
+function playNote(freq){
+	osc = context.createOscillator(); // instantiate an oscillator
+	osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
+	osc.frequency.value = freq; // Hz
+	
+	gainNode = context.createGain();
+	gainNode.gain.value = 0.13;
+	osc.connect(gainNode);
+	gainNode.connect(context.destination);
+
+	osc.connect(context.destination); // connect it to the destination
+	osc.start(); // start the oscillator
+	osc.stop(context.currentTime + 0.5); // stop 2 seconds after the current time
+}
+  
+////////////////////////////////////////////////////////////////////////
+
+
+
+function makeChord(){
+	var frets=[];
+	var i=0;
+	$(".cm").each(function(){
+			
+			if( !$(this).hasClass("fingerOn")){
+						frets[i]=0;//frets.push(0);
+			}else{
+						frets[i]=$(this).parent().attr("data-fret");
+						//frets.push($(this).parent().attr("data-fret"));
+			}
+			i++;
+	});
+
+	console.log(frets);
+}
+
+// DEFINE CHORD DICIONARY
+var guitar = {
+	"chords":{
+		"A":{
+			"major":[
+						{"frets":[0,0,2,2,2,0],"fingers":[0,0,1,2,3,0]},
+						{"frets":[0,0,2,2,2,0],"fingers":[0,0,1,1,1,0]}
+					],
+
+			"minor":[
+					{"frets":[0,0,2,2,1,0],"fingers":[0,0,2,3,1,0]}
+					]
+
+			},
+		"B":{
+			"major":[
+						{"frets":[0,0,4,4,4,2],"fingers":[0,0,2,3,4,1]},
+					]
+			},
+		"C":{
+			"major":[
+						{"frets":[0,3,2,0,1,0],"fingers":[0,3,2,0,1,0]}
+					],
+			"minor":[
+						{"frets":[0,2,2,0,0,0],"fingers":[0,2,3,0,0,0]}
+					],
+			"major7":[
+						{"frets":[0,3,2,0,0,0],"fingers":[0,3,2,0,0,0]}
+					]		
+			},
+		"D":{
+				"major":[
+							{"frets":[0,0,0,2,3,2],"fingers":[0,0,0,1,3,2]}
+						],
+				"minor":[
+							{"frets":[0,0,0,2,3,1],"fingers":[0,2,3,0,0,0]}
+						]
+				},
+		"E":{
+			"major":[
+						{"frets":[0,2,2,1,0,0],"fingers":[0,2,3,1,0,0]}
+					],
+			"minor":[
+						{"frets":[0,2,2,0,0,0],"fingers":[0,2,3,0,0,0]}
+					]
+			},
+		"F":{
+				"major":[
+							{"frets":[0,0,3,2,1,1],"fingers":[0,0,3,2,1,1]}
+						],
+				"minor":[
+							{"frets":[0,0,3,1,1,1],"fingers":[0,0,3,1,1,1]}
+						]
+				},
+		"G":{
+			"major":[
+						{"frets":[3,2,0,0,0,3],"fingers":[2,1,0,0,0,3]}
+					],
+			"minor":[
+						{"frets":[0,2,2,0,0,0],"fingers":[0,2,3,0,0,0]}
+					]
+			}
+	}
+};
+
+
+function getChordList(){}
+
+// GLOBALS
+var fretBoardColor="#f5efe0";//"#fda";
+var fingerDotColor="#222"//"#a00";
+var fretColor="#777";
+var nutColor = "#222";
+var stringColor = "#ccc";
+var frets = 4;
+var guitarHeight = 65*frets;
+var guitarWidth = 120;
+
+drawChord("A","major");
+drawChord("B","major");
+drawChord("C","major");
+drawChord("C","major7");
+drawChord("D","major");
+drawChord("E","major");
+drawChord("F","major");
+drawChord("G","major");
+
+function drawFrets(){
+	fingerSize=8;
+	stringWidth = 6;
+	stringGap = 15;
+	nutHeight = 4;
+	fretHeight = (guitarHeight/frets) - nutHeight;
+
+	guitarCanvas = document.createElement("canvas");
+	guitarCanvas.id = "guitar";
+	guitarCanvas.width = guitarWidth;
+	guitarCanvas.height = guitarHeight;
+	canvas = guitarCanvas;
+	ctx = canvas.getContext("2d");
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	//FRETBOARD
+	ctx.fillStyle=fretBoardColor;
+	//console.log(fretBoardColor);
+	ctx.fillRect(stringGap/2,0,guitarWidth-(stringGap*2)+stringGap,guitarHeight);
+
+	//NUT
+	ctx.fillStyle=nutColor;
+	ctx.fillRect(10,0,guitarWidth-20,nutHeight);
+
+	//DRAW FRETS
+	ctx.fillStyle=fretColor;
+	var fretPos = fretHeight;
+
+	for(var i=0;i<=frets;i++){
+		ctx.fillRect(stringGap-stringWidth,fretPos,guitarWidth-stringGap,nutHeight);
+		//ctx.fillRect(0,fretPos,guitarWidth,nutHeight);
+		fretPos += fretHeight - nutHeight;
+	}
+
+	// DRAW ALL 6 STRINGS
+	var xpos=0;
+	for(var i=0;i<6;i++){
+		//ctx.fillStyle="#851";
+		if(i == 0){xpos = stringWidth*2}else{xpos = xpos + (stringWidth + stringGap); stringWidth--;}
+		lingrad = ctx.createLinearGradient(xpos,0,xpos+stringWidth,0);
+		lingrad.addColorStop(0, '#444');
+		lingrad.addColorStop(0.3, '#cfaa80');
+		lingrad.addColorStop(0.75, '#444');
+		lingrad.addColorStop(1, '#444');
+		ctx.fillStyle=lingrad;
+		ctx.fillRect(xpos,0,stringWidth,guitarHeight);
+	}
+
+	//document.body.appendChild(guitarCanvas);
+}// END DRAWFRETS FUNCTION
+
+function drawChord(root,type){
+	drawFrets();
+	ctx.fillStyle=fingerDotColor;
+	var strings=guitar.chords[root][type][0].frets;
+	for(var i =0; i<strings.length;i++){
+		n = strings[i];
+		if( n > 0){
+				fingerX = stringGap*i + stringGap +  i*2+i*2;
+				fingerY = fretHeight*n - fretHeight/2;
+				//fingerSize = 8;
+				ctx.fillStyle = fingerDotColor;
+				ctx.beginPath();
+				ctx.arc(fingerX, fingerY, fingerSize,0, 2 * Math.PI, false);
+				ctx.fill();
+				ctx.fillStyle = "white";
+				ctx.font='bold 12pt Calibri';
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				ctx.fillText(guitar.chords[root][type][0].fingers[i],fingerX,fingerY);
+		}
+	}
+
+	var image = new Image();
+	image.src = canvas.toDataURL();
+	var el = document.getElementById("chordSheet");
+	el.appendChild(image);
+//document.getElementById('image_for_crop').appendChild(image);
+}// END DRAWCHORD FUNCTION
+
+</script>
+</body>
+</html>
